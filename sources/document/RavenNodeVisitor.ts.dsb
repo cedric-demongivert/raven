@@ -1,0 +1,128 @@
+import { RavenNode } from "./RavenNode"
+import { RavenTag } from "./RavenTag"
+import { RavenText } from "./RavenText"
+
+/**
+ * 
+ */
+export class RavenNodeVisitor {
+  /**
+   * 
+   */
+  private _stop: boolean
+
+  /**
+   * 
+   */
+  public constructor() {
+    this._stop = false
+  }
+
+  /**
+   * 
+   */
+  public visit(node: RavenNode): void {
+    this.enter(node)
+
+    if (this._stop || node.head == null) {
+      this.exit(node)
+      this._stop = false
+      return
+    }
+
+    let cursor: RavenNode = node.head
+
+    while (cursor != node) {
+      this.enter(cursor)
+
+      if (this._stop || cursor.head == null) {
+        this.exit(cursor)
+
+        while (cursor.next == null && cursor !== node) {
+          this.exit(cursor.parent!)
+          cursor = cursor.parent!
+        }
+
+        if (cursor === node) {
+          this.exit(node)
+          this._stop = false
+          continue
+        }
+
+        cursor = cursor.next!
+        this._stop = false
+        continue
+      }
+
+      cursor = cursor.head
+    }
+  }
+
+  /**
+   * 
+   */
+  public enter(node: RavenNode): void {
+    if (node instanceof RavenText) {
+      this.enterText(node)
+    }
+
+    if (node instanceof RavenTag) {
+      this.enterTag(node)
+    }
+  }
+
+  /**
+   * 
+   */
+  public enterText(node: RavenText): void {
+
+  }
+
+  /**
+   * 
+   */
+  public enterTag(node: RavenTag): void {
+
+  }
+
+  /**
+   * 
+   */
+  public exit(node: RavenNode): void {
+    if (node instanceof RavenText) {
+      this.exitText(node)
+    }
+
+    if (node instanceof RavenTag) {
+      this.exitTag(node)
+    }
+  }
+
+  /**
+   * 
+   */
+  public exitText(node: RavenText): void {
+
+  }
+
+  /**
+   * 
+   */
+  public exitTag(node: RavenTag): void {
+
+  }
+
+  /**
+   * 
+   */
+  public stop(): void {
+    this._stop = true
+  }
+}
+
+/**
+ * 
+ */
+export namespace RavenNodeVisitor {
+
+}
