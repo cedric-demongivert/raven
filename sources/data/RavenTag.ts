@@ -1,10 +1,10 @@
-import { Empty } from '@cedric-demongivert/gl-tool-utils'
-import { RavenNode } from './RavenNode'
+import { RavenNode } from '../tree/RavenNode'
+import { RavenData } from './RavenData'
 
 /**
  * 
  */
-export class RavenTag extends RavenNode {
+export class RavenTag extends RavenNode implements RavenData {
   /**
    * 
    */
@@ -23,23 +23,18 @@ export class RavenTag extends RavenNode {
   /**
    * 
    */
+  public margin: boolean
+
+  /**
+   * 
+   */
   public constructor() {
     super()
 
     this.tag = RavenTag.DEFAULT_TAG
     this.identifier = null
     this.classes = new Set()
-  }
-
-  /**
-   * 
-   */
-  public hasAllClass(classes: Iterable<string>): boolean {
-    for (const clazz of classes) {
-      if (!this.classes.has(clazz)) return false
-    }
-
-    return true
+    this.margin = false
   }
 
   /**

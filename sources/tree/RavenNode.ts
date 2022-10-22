@@ -304,6 +304,13 @@ export namespace RavenNode {
   /**
    * 
    */
+  export function is(element: unknown): element is RavenNode {
+    return element instanceof RavenNode
+  }
+
+  /**
+   * 
+   */
   export function create(): RavenNode {
     return new RavenNode()
   }

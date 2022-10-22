@@ -1,16 +1,19 @@
 import { RavenOperator } from "./RavenOperator"
-import { RavenTextOperator } from "./RavenTextOperator"
 
 /**
  * 
  */
-export class RavenIntOperator implements RavenOperator<unknown, number> {
+export class RavenIntOperator<Element> implements RavenOperator<Element, Exclude<Element, string> | number> {
   /**
    * @see RavenOperator.apply
    */
-  public * apply(selection: Iterable<unknown>): IterableIterator<number> {
-    for (const word of RavenTextOperator.apply(selection)) {
-      yield parseInt(word)
+  public * apply(selection: Iterable<Element>): IterableIterator<Exclude<Element, string> | number> {
+    for (const element of selection) {
+      if (typeof element === 'string') {
+        yield parseInt(element)
+      } else {
+        yield element as Exclude<Element, string>
+      }
     }
   }
 
@@ -39,19 +42,19 @@ export namespace RavenIntOperator {
   /**
    * 
    */
-  export const INSTANCE: RavenIntOperator = new RavenIntOperator()
+  export const INSTANCE: RavenIntOperator<any> = new RavenIntOperator()
 
   /**
    * 
    */
-  export function apply(selection: Iterable<unknown>): IterableIterator<number> {
+  export function apply<Element>(selection: Iterable<Element>): IterableIterator<Exclude<Element, string> | number> {
     return INSTANCE.apply(selection)
   }
 
   /**
    * 
    */
-  export function get(): RavenIntOperator {
+  export function get<Element>(): RavenIntOperator<Element> {
     return INSTANCE
   }
 }

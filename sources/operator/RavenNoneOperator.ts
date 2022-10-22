@@ -8,7 +8,7 @@ export class RavenNoneOperator<Input, Output> implements RavenOperator<Input, Ou
    * @see RavenOperator.apply
    */
   public * apply(selection: Iterable<Input>): IterableIterator<Output> {
-    return
+
   }
 
   /**

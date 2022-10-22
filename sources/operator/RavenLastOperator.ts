@@ -52,7 +52,7 @@ export namespace RavenLastOperator {
   /**
    * 
    */
-  export function apply<Input, Output>(selection: Iterable<Input>): IterableIterator<Output> {
+  export function apply<Element>(selection: Iterable<Element>): IterableIterator<Element> {
     return INSTANCE.apply(selection)
   }
 

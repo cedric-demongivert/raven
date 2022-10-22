@@ -1,17 +1,20 @@
 import { Sequence } from "@cedric-demongivert/gl-tool-collection"
-import { RavenNode } from "../document"
+
+import { RavenOperator } from "../../operator/RavenOperator"
+
+import { RavenNode } from "../RavenNode"
+
 import { RavenAllOperator } from "./RavenAllOperator"
 import { RavenNodeOperator } from "./RavenNodeOperator"
-import { RavenOperator } from "./RavenOperator"
 
 /**
  * 
  */
-export class RavenDepthOperator implements RavenOperator<unknown, RavenNode> {
+export class RavenDepthOperator<Element> implements RavenOperator<Element, Element | RavenNode> {
   /**
    * 
    */
-  public readonly operators: Sequence<RavenOperator<RavenNode>>
+  public readonly operators: Sequence<RavenOperator<Element | RavenNode>>
 
   /**
    * 
@@ -23,14 +26,12 @@ export class RavenDepthOperator implements RavenOperator<unknown, RavenNode> {
   /**
    * @see RavenOperator.apply
    */
-  public apply(selection: Iterable<unknown>): Iterable<RavenNode> {
+  public apply(selection: Iterable<Element>): Iterable<Element | RavenNode> {
     const operators = this.operators
 
-    let result: Iterable<RavenNode> = RavenNodeOperator.apply(selection)
+    if (operators.size <= 0) return selection
 
-    if (operators.size <= 0) return result
-
-    result = operators.get(0).apply(result)
+    let result = operators.get(0).apply(selection)
 
     for (let index = 1, size = operators.size; index < size; ++index) {
       result = RavenAllOperator.apply(result)
@@ -69,7 +70,7 @@ export namespace RavenDepthOperator {
   /**
    * 
    */
-  export function create(operators: Iterable<RavenOperator<RavenNode>>): RavenDepthOperator {
+  export function create<Element>(operators: Iterable<RavenOperator<RavenNode>>): RavenDepthOperator<Element> {
     return new RavenDepthOperator(operators)
   }
 }

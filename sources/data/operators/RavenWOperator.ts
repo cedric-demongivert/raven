@@ -95,6 +95,10 @@ export class RavenTextOperator implements RavenOperator<unknown, string> {
         }
       }
     }
+
+    if (current.length > 0) {
+      yield current
+    }
   }
 
   /**

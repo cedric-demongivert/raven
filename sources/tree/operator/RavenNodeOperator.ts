@@ -1,5 +1,5 @@
-import { RavenNode } from "../document"
-import { RavenOperator } from "./RavenOperator"
+import { RavenOperator } from "../../operator/RavenOperator"
+import { RavenNode } from "../RavenNode"
 
 /**
  * 
@@ -10,7 +10,7 @@ export class RavenNodeOperator implements RavenOperator<unknown, RavenNode> {
    */
   public * apply(selection: Iterable<unknown>): IterableIterator<RavenNode> {
     for (const element of selection) {
-      if (element instanceof RavenNode) {
+      if (RavenNode.is(element)) {
         yield element
       }
     }

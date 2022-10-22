@@ -1,6 +1,7 @@
 import { RavenWord } from "../document/RavenWord"
 import { RavenTag } from "../document/RavenTag"
 import { RavenOperator } from "./RavenOperator"
+import { RavenText } from "../RavenText"
 
 /**
  * 
@@ -10,7 +11,7 @@ const WHITESPACES = /\s+/
 /**
  * 
  */
-export class RavenWordOperator implements RavenOperator<unknown, RavenWord> {
+export class RavenWordOperator implements RavenOperator<unknown, RavenText> {
   /**
    * @see RavenOperator.apply
    */

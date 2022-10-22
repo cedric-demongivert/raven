@@ -4,7 +4,7 @@ import { RavenOperator } from "./RavenOperator"
 /**
  * 
  */
-export class RavenDisjunctionOperator<Input, Output> implements RavenOperator<Input, Output> {
+export class RavenOperatorUnion<Input, Output> implements RavenOperator<Input, Output> {
   /**
    * 
    */
@@ -41,7 +41,7 @@ export class RavenDisjunctionOperator<Input, Output> implements RavenOperator<In
     if (other == null) return false
     if (other === this) return true
 
-    if (other instanceof RavenDisjunctionOperator) {
+    if (other instanceof RavenOperatorUnion) {
       return this.operators.equals(other.operators)
     }
 
@@ -52,11 +52,11 @@ export class RavenDisjunctionOperator<Input, Output> implements RavenOperator<In
 /**
  * 
  */
-export namespace RavenDisjunctionOperator {
+export namespace RavenOperatorUnion {
   /**
    * 
    */
-  export function create<Input, Output>(operators: Iterable<RavenOperator<Input, Output>>): RavenDisjunctionOperator<Input, Output> {
-    return new RavenDisjunctionOperator(operators)
+  export function create<Input, Output>(operators: Iterable<RavenOperator<Input, Output>>): RavenOperatorUnion<Input, Output> {
+    return new RavenOperatorUnion(operators)
   }
 }

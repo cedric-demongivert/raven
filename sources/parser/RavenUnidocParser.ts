@@ -11,12 +11,13 @@ import {
   UTF16CodeUnit
 } from "@cedric-demongivert/unidoc"
 
-import { RavenWhitespace } from "../document/RavenWhitespace"
-import { RavenWord } from "../document/RavenWord"
-import { RavenTag } from "../document/RavenTag"
-import { RavenNode } from "../document/RavenNode"
+import { RavenSource } from "../data/RavenSource"
+import { RavenText } from "../data/RavenText"
+import { RavenTag } from "../data/RavenTag"
+import { RavenNode } from "../tree/RavenNode"
 import { RavenBlob } from "../RavenBlob"
 import { RavenParser } from "./RavenParser"
+import { RavenData } from "sources/data/RavenData"
 
 /**
  * 
@@ -65,12 +66,12 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
   /**
    * 
    */
-  private readonly _stack: Array<RavenNode>
+  private _result: RavenNode
 
   /**
    * 
    */
-  private readonly _anchors: Array<number>
+  private _wasWhitespace: boolean
 
   /**
    * 
@@ -82,8 +83,8 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
     this._tracker = new UnidocTracker()
     this._symbol = new UnidocSymbol()
     this._range = this._symbol.origin.range
-    this._stack = []
-    this._anchors = [0]
+    this._result = new RavenNode()
+    this._wasWhitespace = true
 
     this.handleNext = this.handleNext.bind(this)
     this.handleSuccess = this.handleSuccess.bind(this)
@@ -93,50 +94,45 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
    * 
    */
   private handleStartOfTag(event: UnidocEvent): void {
-    this._stack.push(toRavenTag(event))
-    this._anchors.push(this._stack.length)
+    if (this._wasWhitespace && this._result.tail != null) {
+      const tail: RavenNode = this._result.tail
+      if (RavenData.is(tail)) tail.margin = true
+    }
+
+    const tag: RavenTag = toRavenTag(event)
+
+    this._result.push(tag)
+    this._result = tag
   }
 
   /**
    * 
    */
   private handleEndOfTag(): void {
-    const stack = this._stack
-    const anchor: number = this._anchors.pop()!
-    const tag: RavenNode = stack[anchor - 1]
-
-    while (stack.length > anchor) {
-      tag.unshift(stack.pop()!)
-    }
-  }
-
-  /**
-   * 
-   */
-  private handleWhitespace(event: UnidocEvent): void {
-    const stack = this._stack
-    const last: RavenNode | undefined = stack[stack.length - 1]
-    const anchor: number = this._anchors[this._anchors.length - 1]!
-
-    if (stack.length > anchor && RavenWhitespace.is(last)) {
-      last.content += event.symbols.toString()
-    } else {
-      stack.push(RavenWhitespace.wrap(event.symbols.toString()))
-    }
+    this._result = this._result.parent!
   }
 
   /**
    * 
    */
   private handleWord(event: UnidocEvent): void {
-    const stack = this._stack
-    const last: RavenNode | undefined = stack[stack.length - 1]
-    const anchor: number = this._anchors[this._anchors.length - 1]!
+    const current: RavenNode = this._result
+    const tail: RavenNode | null = current.tail
 
-    if (stack.length > anchor && RavenWord.is(last)) {
-      last.content += event.symbols.toString()
+    if (RavenText.is(tail)) {
+      if (this._wasWhitespace) {
+        tail.words.push(event.symbols.toString())
+      } else {
+        tail.words[tail.words.length - 1] += event.symbols.toString()
+      }
     } else {
-      stack.push(RavenWord.wrap(event.symbols.toString()))
+      if (this._wasWhitespace && RavenData.is(tail)) {
+        tail.margin = true
+      }
+
+      const text: RavenText = new RavenText()
+      text.words.push(event.symbols.toString())
+      current.push(text)
     }
   }
 
@@ -155,22 +151,21 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
         this.handleWord(event)
         break
       case UnidocEventType.WHITESPACE:
-        this.handleWhitespace(event)
         break
       default:
         throw new Error('Unhandled event type : ' + UnidocEventType.toDebugString(event.type) + '.')
     }
+
+    this._wasWhitespace = event.isWhitespace()
   }
 
   /**
    * 
    */
   private handleSuccess(): void {
-    const document: RavenNode = new RavenNode()
-
-    for (const node of this._stack) {
-      document.push(node)
-    }
+    const document: RavenNode = this._result
+    this._result = new RavenNode()
+    this._wasWhitespace = true
 
     this.output.start()
     this.output.next(document)
@@ -181,6 +176,9 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
    * 
    */
   private handleFailure(error: Error): void {
+    this._result = new RavenNode()
+    this._wasWhitespace = true
+
     this.output.start()
     this.output.failure(error)
   }
@@ -203,9 +201,7 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
 
     this._tracker.clear()
     this._symbol.clear()
-
-    this._stack.length = 0
-    this._anchors.length = 1
+    this._wasWhitespace = true
   }
 
   /**
@@ -216,6 +212,12 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
     const tracker = this._tracker
     const range = this._range
     const lexer = this._lexer
+
+    const source: RavenSource = new RavenSource()
+    source.uri.copy(blob.source)
+
+    this._result.push(new RavenSource())
+    this._result = source
 
     const content: string = blob.buffer.toString() // @TODO UTF-8 / UTF-16 conversion to symbols.
 
@@ -241,6 +243,8 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
 
       lexer.next(symbol)
     }
+
+    this._result = this._result.parent!
   }
 
   /**
