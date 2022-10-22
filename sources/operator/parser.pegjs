@@ -17,7 +17,7 @@ DepthOperator = head:IntersectionOperator tail:(_ IntersectionOperator)* {
             operators.push(tail[index])
       }
 
-      return operators.length === 1 ? operators[0] : RavenOperator.depth(operators);
+      return operators.length === 1 ? operators[0] : RavenDataOperators.depth(operators);
 }
     
 IntersectionOperator = operators:(AtomicOperator)+ {
@@ -30,9 +30,9 @@ AtomicOperator = ClassOperator /
                  TagOperator 
 
 AnythingOperator = "*" { return RavenOperator.identity(); }
-ClassOperator = "." identifier:Identifier { return RavenOperator.clazz(identifier); }
-IdentifierOperator = "#" identifier:Identifier { return RavenOperator.identifier(identifier); }
-TagOperator = identifier:Identifier { return RavenOperator.tag(identifier); }
+ClassOperator = "." identifier:Identifier { return RavenDataOperators.clazz(identifier); }
+IdentifierOperator = "#" identifier:Identifier { return RavenDataOperators.identifier(identifier); }
+TagOperator = identifier:Identifier { return RavenDataOperators.tag(identifier); }
 
 Identifier = [^ \t\n\r.#]+ { return text(); }
 

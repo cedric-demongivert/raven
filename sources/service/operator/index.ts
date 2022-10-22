@@ -1,0 +1,1 @@
+export { RavenSlugifyOperator } from './RavenSlugifyOperator'

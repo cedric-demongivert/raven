@@ -1,0 +1,5 @@
+export { RavenClassOperator } from './RavenClassOperator'
+export { RavenDataOperators } from './RavenDataOperators'
+export { RavenIdentifierOperator } from './RavenIdentifierOperator'
+export { RavenTagOperator } from './RavenTagOperator'
+export { RavenTextOperator } from './RavenTextOperator'

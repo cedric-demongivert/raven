@@ -5,7 +5,6 @@ import { RavenOperator } from "../../operator/RavenOperator"
 import { RavenNode } from "../RavenNode"
 
 import { RavenAllOperator } from "./RavenAllOperator"
-import { RavenNodeOperator } from "./RavenNodeOperator"
 
 /**
  * 

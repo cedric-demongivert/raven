@@ -1,6 +1,6 @@
-import { UnidocConsumer, UnidocFunction, UnidocProducer } from "@cedric-demongivert/unidoc"
+import { UnidocFunction } from "@cedric-demongivert/unidoc"
 
-import { RavenNode } from "../document"
+import { RavenNode } from "../tree/RavenNode"
 
 import { RavenBlob } from "../RavenBlob"
 

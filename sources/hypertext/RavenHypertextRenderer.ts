@@ -1,9 +1,8 @@
 import { Empty } from "@cedric-demongivert/gl-tool-utils"
-import { RavenWhitespace } from "../document/RavenWhitespace"
-import { RavenWord } from "../document/RavenWord"
-import { RavenOperator } from "../operator/RavenOperator"
-import { RavenNode } from "../document/RavenNode"
-import { RavenTag } from "../document/RavenTag"
+import { RavenText } from "../data/RavenText"
+import { RavenNode } from "../tree/RavenNode"
+import { RavenTag } from "../data/RavenTag"
+import { RavenTextVisitor } from "../data/RavenTextVisitor"
 
 /**
  * 
@@ -72,7 +71,7 @@ export namespace RavenHypertextRenderer {
    * 
    */
   export function renderSectionTitle(node: RavenNode, depth: number): string {
-    const content: string = renderText(node.all())
+    const content: string = RavenTextVisitor.get().visit(node)
 
     switch (depth) {
       case 0:
@@ -101,7 +100,7 @@ export namespace RavenHypertextRenderer {
     for (const element of node.children()) {
       if (RavenTag.is(element) && element.tag === TITLE_TAG) {
         result += '<strong class="paragraph-title">'
-        result += renderText(element.all())
+        result += RavenTextVisitor.get().visit(element)
         result += '</strong>'
       }
     }
@@ -115,41 +114,15 @@ export namespace RavenHypertextRenderer {
   /**
    * 
    */
-  export function renderText(nodes: Iterable<RavenNode>): string {
-    let result: string = Empty.STRING
-    let words: Iterator<string> = RavenOperator.text().apply(nodes)
-    let iteratorResult: IteratorResult<string> = words.next()
-
-    if (iteratorResult.done) {
-      return result
-    }
-
-    result = iteratorResult.value
-    iteratorResult = words.next()
-
-    while (!iteratorResult.done) {
-      result += ' '
-      result += iteratorResult.value
-      iteratorResult = words.next()
-    }
-
-    return result
-  }
-
-  /**
-   * 
-   */
   export function renderHypertext(nodes: Iterable<RavenNode>): string {
-    let wasSpace: boolean = true
     let result: string = Empty.STRING
 
     for (const node of nodes) {
-      if (node instanceof RavenWhitespace && !wasSpace) {
-        result += ' '
-      }
-
-      if (node instanceof RavenWord) {
-        result += node.content
+      if (node instanceof RavenText) {
+        result += node.words.join(' ')
+        if (node.margin) {
+          result += ' '
+        }
       }
 
       if (node instanceof RavenTag) {
@@ -157,10 +130,12 @@ export namespace RavenHypertextRenderer {
           result += '<strong>'
           result += renderHypertext(node.children())
           result += '</strong>'
+
+          if (node.margin) {
+            result += ' '
+          }
         }
       }
-
-      wasSpace = node instanceof RavenWhitespace
     }
 
     return result

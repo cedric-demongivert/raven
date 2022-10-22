@@ -17,7 +17,7 @@ import { RavenTag } from "../data/RavenTag"
 import { RavenNode } from "../tree/RavenNode"
 import { RavenBlob } from "../RavenBlob"
 import { RavenParser } from "./RavenParser"
-import { RavenData } from "sources/data/RavenData"
+import { RavenData } from "../data/RavenData"
 
 /**
  * 
@@ -216,7 +216,7 @@ export class RavenUnidocParser extends UnidocProcess<RavenBlob, RavenNode> imple
     const source: RavenSource = new RavenSource()
     source.uri.copy(blob.source)
 
-    this._result.push(new RavenSource())
+    this._result.push(source)
     this._result = source
 
     const content: string = blob.buffer.toString() // @TODO UTF-8 / UTF-16 conversion to symbols.

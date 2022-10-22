@@ -1,11 +1,12 @@
-import { Empty } from "@cedric-demongivert/gl-tool-utils"
-import { RavenHypertextOperator } from "../hypertext/RavenHypertextOperator"
-import { RavenOperator } from "../operator/RavenOperator"
-import { RavenSlugifier } from "../RavenSlugifier"
+import { Constructor, Empty } from "@cedric-demongivert/gl-tool-utils"
+import { RavenHypertextOperator } from "./hypertext/RavenHypertextOperator"
+import { RavenNodeOperators } from "./tree/operator/RavenNodeOperators"
+import { RavenDataOperators } from "./data/operator/RavenDataOperators"
+import { RavenOperator } from "./operator/RavenOperator"
 
-import { RavenNode } from "./RavenNode"
-import { RavenTag } from "./RavenTag"
-import { RavenWord } from "./RavenWord"
+import { RavenNode } from "./tree/RavenNode"
+import { RavenTag } from "./data/RavenTag"
+import { RavenSlugifyOperator } from "./service/operator/RavenSlugifyOperator"
 
 /**
  * 
@@ -33,9 +34,9 @@ export class RavenSelection<Element> {
   /**
    * 
    */
-  public select<Output>(operator: RavenOperator<RavenNode, Output> | string): RavenSelection<Output> {
+  public select<Output>(operator: RavenOperator<Element | RavenNode, Output> | string): RavenSelection<Output> {
     return new RavenSelection(RavenOperator.toOperator(operator).apply(
-      RavenOperator.all().apply(this.elements)
+      RavenNodeOperators.all<Element>().apply(this.elements)
     ))
   }
 
@@ -56,36 +57,36 @@ export class RavenSelection<Element> {
   /**
    * 
    */
-  public parent(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.parent())
+  public parent(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.parent())
   }
 
   /**
    * 
    */
-  public next(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.next())
+  public next(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.next())
   }
 
   /**
    * 
    */
-  public previous(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.previous())
+  public previous(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.previous())
   }
 
   /**
    * 
    */
-  public children(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.children())
+  public children(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.children())
   }
 
   /**
    * 
    */
-  public parents(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.parents())
+  public parents(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.parents())
   }
 
   /**
@@ -103,22 +104,22 @@ export class RavenSelection<Element> {
   /**
    * 
    */
-  public all(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.all())
+  public all(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.all())
   }
 
   /**
    * 
    */
-  public forward(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.forward())
+  public forward(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.forward())
   }
 
   /**
    * 
    */
-  public backward(): RavenSelection<RavenNode> {
-    return this.select(RavenOperator.backward())
+  public backward(): RavenSelection<Element | RavenNode> {
+    return this.apply(RavenNodeOperators.backward())
   }
 
   /**
@@ -150,29 +151,22 @@ export class RavenSelection<Element> {
   /**
    * 
    */
-  public words(): RavenSelection<RavenWord> {
-    return this.select(RavenOperator.word())
+  public text(): RavenSelection<Exclude<Element, RavenNode> | string> {
+    return this.apply(RavenDataOperators.text())
   }
 
   /**
    * 
    */
-  public text(): RavenSelection<string> {
-    return this.select(RavenOperator.text())
+  public ints(): RavenSelection<Exclude<Element, string> | number> {
+    return this.apply(RavenOperator.int())
   }
 
   /**
    * 
    */
-  public ints(): RavenSelection<number> {
-    return this.select(RavenOperator.int())
-  }
-
-  /**
-   * 
-   */
-  public floats(): RavenSelection<number> {
-    return this.select(RavenOperator.float())
+  public floats(): RavenSelection<Exclude<Element, string> | number> {
+    return this.apply(RavenOperator.float())
   }
 
   /**
@@ -185,53 +179,43 @@ export class RavenSelection<Element> {
   /**
    * 
    */
-  public slug(): string | undefined {
-    const iterator: Iterator<string> = RavenOperator.text().apply(this.elements)
-    let iteratorResult: IteratorResult<string> = iterator.next()
-
-    if (iteratorResult.done) {
-      return undefined
-    }
-
-    let result: string = iteratorResult.value
-    iteratorResult = iterator.next()
-
-    while (!iteratorResult.done) {
-      result += '-'
-      result += iteratorResult.value
-      iteratorResult = iterator.next()
-    }
-
-    return RavenSlugifier.map(result)
-  }
-
-
-  /**
-   * 
-   */
-  public tags(): RavenSelection<RavenTag> {
-    return this.select(RavenOperator.tags())
+  public slugify(): RavenSelection<Element | string> {
+    return this.apply(RavenSlugifyOperator.get())
   }
 
   /**
    * 
    */
-  public clazz(identifier: string): RavenSelection<RavenTag> {
-    return this.select(RavenOperator.clazz(identifier))
+  public clazz(identifier: string): RavenSelection<Element | RavenTag> {
+    return this.apply(RavenDataOperators.clazz(identifier))
   }
 
   /**
    * 
    */
-  public identifier(identifier: string): RavenSelection<RavenTag> {
-    return this.select(RavenOperator.identifier(identifier))
+  public identifier(identifier: string): RavenSelection<Element | RavenTag> {
+    return this.apply(RavenDataOperators.identifier(identifier))
   }
 
   /**
    * 
    */
-  public tag(identifier: string): RavenSelection<RavenTag> {
-    return this.select(RavenOperator.tag(identifier))
+  public tag(identifier: string): RavenSelection<Element | RavenTag> {
+    return this.apply(RavenDataOperators.tag(identifier))
+  }
+
+  /**
+   * 
+   */
+  public instanceOf<Output>(type: Constructor<Output>): RavenSelection<Output> {
+    return this.apply(RavenOperator.instanceOf(type))
+  }
+
+  /**
+   * 
+   */
+  public none<Output>(): RavenSelection<Output> {
+    return new RavenSelection()
   }
 
   /**
@@ -292,6 +276,13 @@ export namespace RavenSelection {
    */
   export function create<Element>(elements: Iterable<Element>): RavenSelection<Element> {
     return new RavenSelection(elements)
+  }
+
+  /**
+   * 
+   */
+  export function empty<Element>(): RavenSelection<Element> {
+    return new RavenSelection()
   }
 
   /**

@@ -1,4 +1,4 @@
-import { RavenTag } from "../document/RavenTag"
+import { RavenTag } from "../data/RavenTag"
 import { RavenOperator } from "../operator/RavenOperator"
 
 import { RavenHypertextRenderer } from "./RavenHypertextRenderer"
@@ -6,14 +6,16 @@ import { RavenHypertextRenderer } from "./RavenHypertextRenderer"
 /**
  * 
  */
-export class RavenHypertextOperator implements RavenOperator<unknown, string> {
+export class RavenHypertextOperator<Element> implements RavenOperator<Element, Exclude<Element, RavenTag> | string> {
   /**
    * @see RavenOperator.apply
    */
-  public * apply(selection: Iterable<unknown>): IterableIterator<string> {
+  public * apply(selection: Iterable<Element>): IterableIterator<Exclude<Element, RavenTag> | string> {
     for (const element of selection) {
       if (RavenTag.is(element)) {
         yield RavenHypertextRenderer.renderSection(element, 0)
+      } else {
+        yield element as Exclude<Element, RavenTag>
       }
     }
   }
@@ -43,19 +45,19 @@ export namespace RavenHypertextOperator {
   /**
    * 
    */
-  export const INSTANCE: RavenHypertextOperator = new RavenHypertextOperator()
+  export const INSTANCE: RavenHypertextOperator<any> = new RavenHypertextOperator()
 
   /**
    * 
    */
-  export function apply(selection: Iterable<unknown>): IterableIterator<string> {
+  export function apply<Element>(selection: Iterable<Element>): IterableIterator<Exclude<Element, RavenTag> | string> {
     return INSTANCE.apply(selection)
   }
 
   /**
    * 
    */
-  export function get(): RavenHypertextOperator {
+  export function get<Element>(): RavenHypertextOperator<Element> {
     return INSTANCE
   }
 }

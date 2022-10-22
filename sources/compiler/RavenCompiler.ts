@@ -1,10 +1,15 @@
-import { RavenSelection } from "../document"
+import { RavenSelection } from "../RavenSelection"
 import { RavenNunjucksCompiler } from "./RavenNunjucksCompiler"
 
 /**
  * 
  */
 export interface RavenCompiler {
+  /**
+   * 
+   */
+  compile<Element>(selection: RavenSelection<Element>, output: string): void
+
   /**
    * 
    */
