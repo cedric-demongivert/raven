@@ -5,15 +5,16 @@ import { RavenOperator } from "../../operator/RavenOperator"
 import { RavenNode } from "../RavenNode"
 
 import { RavenAllOperator } from "./RavenAllOperator"
+import { RavenNodeOperators } from "./RavenNodeOperators"
 
 /**
  * 
  */
-export class RavenDepthOperator<Element> implements RavenOperator<Element, Element | RavenNode> {
+export class RavenDepthOperator implements RavenOperator<unknown, RavenNode> {
   /**
    * 
    */
-  public readonly operators: Sequence<RavenOperator<Element | RavenNode>>
+  public readonly operators: Sequence<RavenOperator<unknown | RavenNode, RavenNode>>
 
   /**
    * 
@@ -25,10 +26,10 @@ export class RavenDepthOperator<Element> implements RavenOperator<Element, Eleme
   /**
    * @see RavenOperator.apply
    */
-  public apply(selection: Iterable<Element>): Iterable<Element | RavenNode> {
+  public apply(selection: Iterable<unknown>): Iterable<RavenNode> {
     const operators = this.operators
 
-    if (operators.size <= 0) return selection
+    if (operators.size <= 0) return RavenNodeOperators.instanceOfNode().apply(selection)
 
     let result = operators.get(0).apply(selection)
 
@@ -69,7 +70,7 @@ export namespace RavenDepthOperator {
   /**
    * 
    */
-  export function create<Element>(operators: Iterable<RavenOperator<RavenNode>>): RavenDepthOperator<Element> {
+  export function create(operators: Iterable<RavenOperator<unknown | RavenNode, RavenNode>>): RavenDepthOperator {
     return new RavenDepthOperator(operators)
   }
 }

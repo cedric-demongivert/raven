@@ -4,16 +4,14 @@ import { RavenNode } from "../RavenNode"
 /**
  * 
  */
-export class RavenPreviousOperator<Element> implements RavenOperator<Element, Element | RavenNode> {
+export class RavenPreviousOperator implements RavenOperator<unknown, RavenNode> {
   /**
    * @see RavenOperator.apply
    */
-  public * apply(selection: Iterable<Element>): IterableIterator<Element | RavenNode> {
+  public * apply(selection: Iterable<unknown>): IterableIterator<RavenNode> {
     for (const element of selection) {
       if (RavenNode.is(element) && element.previous) {
         yield element.previous
-      } else {
-        yield element
       }
     }
   }
@@ -43,19 +41,19 @@ export namespace RavenPreviousOperator {
   /**
    * 
    */
-  export const INSTANCE: RavenPreviousOperator<any> = new RavenPreviousOperator()
+  export const INSTANCE: RavenPreviousOperator = new RavenPreviousOperator()
 
   /**
    * 
    */
-  export function apply<Element>(selection: Iterable<Element>): IterableIterator<Element | RavenNode> {
+  export function apply(selection: Iterable<unknown>): IterableIterator<RavenNode> {
     return INSTANCE.apply(selection)
   }
 
   /**
    * 
    */
-  export function get<Element>(): RavenPreviousOperator<Element> {
+  export function get(): RavenPreviousOperator {
     return INSTANCE
   }
 }

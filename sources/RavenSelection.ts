@@ -34,9 +34,9 @@ export class RavenSelection<Element> {
   /**
    * 
    */
-  public select<Output>(operator: RavenOperator<Element | RavenNode, Output> | string): RavenSelection<Output> {
+  public select<Output>(operator: RavenOperator<RavenNode, Output> | string): RavenSelection<Output> {
     return new RavenSelection(RavenOperator.toOperator(operator).apply(
-      RavenNodeOperators.all<Element>().apply(this.elements)
+      RavenNodeOperators.all().apply(this.elements)
     ))
   }
 

@@ -5,7 +5,7 @@ import { RavenTag } from "../RavenTag"
 /**
  * 
  */
-export class RavenClassOperator<Element> implements RavenOperator<Element, Element | RavenTag> {
+export class RavenClassOperator implements RavenOperator<unknown, RavenTag> {
   /**
    * 
    */
@@ -21,14 +21,12 @@ export class RavenClassOperator<Element> implements RavenOperator<Element, Eleme
   /**
    * @see RavenOperator.apply
    */
-  public * apply(selection: Iterable<Element>): IterableIterator<Element | RavenTag> {
+  public * apply(selection: Iterable<unknown>): IterableIterator<RavenTag> {
     const identifier: string = this.identifier
 
     for (const element of selection) {
       if (RavenTag.is(element)) {
         if (element.classes.has(identifier)) yield element
-      } else {
-        yield element
       }
     }
   }
@@ -62,7 +60,7 @@ export namespace RavenClassOperator {
   /**
    * 
    */
-  export function create<Element>(identifier: string): RavenClassOperator<Element> {
+  export function create(identifier: string): RavenClassOperator {
     return new RavenClassOperator(identifier)
   }
 }

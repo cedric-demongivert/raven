@@ -3,8 +3,8 @@ Operator = _ operator:UnionOperator _ { return operator }
 UnionOperator = head:DepthOperator tail:(_ "," _ DepthOperator)* {
       const operators = [head]
 
-      for (let index = 3; index < tail.length; index += 4) {
-            operators.push(tail[index])
+      for (const element of tail) {
+            operators.push(element[3])
       }
 
       return operators.length === 1 ? operators[0] : RavenOperator.union(operators);
@@ -13,11 +13,11 @@ UnionOperator = head:DepthOperator tail:(_ "," _ DepthOperator)* {
 DepthOperator = head:IntersectionOperator tail:(_ IntersectionOperator)* {
       const operators = [head]
 
-      for (let index = 1; index < tail.length; index += 2) {
-            operators.push(tail[index])
+      for (const element of tail) {
+            operators.push(element[1])
       }
 
-      return operators.length === 1 ? operators[0] : RavenDataOperators.depth(operators);
+      return operators.length === 1 ? operators[0] : RavenNodeOperators.depth(operators);
 }
     
 IntersectionOperator = operators:(AtomicOperator)+ {

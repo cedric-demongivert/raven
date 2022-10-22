@@ -1,3 +1,7 @@
+import { RavenOperator } from "../../operator"
+
+import { RavenNode } from "../RavenNode"
+
 import { RavenAllOperator } from "./RavenAllOperator"
 import { RavenBackwardOperator } from "./RavenBackwardOperator"
 import { RavenChildrenOperator } from "./RavenChildrenOperator"
@@ -62,4 +66,16 @@ export namespace RavenNodeOperators {
    * 
    */
   export const depth = RavenDepthOperator.create
+
+  /**
+   * 
+   */
+  export const INSTANCEOF_NODE: RavenOperator<unknown, RavenNode> = RavenOperator.instanceOf(RavenNode)
+
+  /**
+   * 
+   */
+  export function instanceOfNode(): RavenOperator<unknown, RavenNode> {
+    return INSTANCEOF_NODE
+  }
 }

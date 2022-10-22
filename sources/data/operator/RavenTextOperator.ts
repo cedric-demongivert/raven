@@ -6,16 +6,14 @@ import { RavenTextVisitor } from "../RavenTextVisitor"
 /**
  * 
  */
-export class RavenTextOperator<Element> implements RavenOperator<Element, Exclude<Element, RavenNode> | string> {
+export class RavenTextOperator implements RavenOperator<unknown, string> {
   /**
    * @see RavenOperator.apply
    */
-  public * apply(selection: Iterable<unknown>): IterableIterator<Exclude<Element, RavenNode> | string> {
+  public * apply(selection: Iterable<unknown>): IterableIterator<string> {
     for (const element of selection) {
       if (RavenNode.is(element)) {
         yield RavenTextVisitor.get().visit(element)
-      } else {
-        yield element as Exclude<Element, RavenNode>
       }
     }
   }
@@ -45,19 +43,19 @@ export namespace RavenTextOperator {
   /**
    * 
    */
-  export const INSTANCE: RavenTextOperator<any> = new RavenTextOperator()
+  export const INSTANCE: RavenTextOperator = new RavenTextOperator()
 
   /**
    * 
    */
-  export function apply<Element>(selection: Iterable<Element>): IterableIterator<Exclude<Element, RavenNode> | string> {
+  export function apply(selection: Iterable<unknown>): IterableIterator<string> {
     return INSTANCE.apply(selection)
   }
 
   /**
    * 
    */
-  export function get<Element>(): RavenTextOperator<Element> {
+  export function get(): RavenTextOperator {
     return INSTANCE
   }
 }
