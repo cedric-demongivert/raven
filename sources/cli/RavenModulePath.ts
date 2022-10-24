@@ -16,7 +16,7 @@ export namespace RavenModulePath {
   export function resolve(argument: string | undefined): string {
     if (argument == null) {
       console.log(
-        'No module path specified, trying to resolve ' +
+        'No module path specified, fallback to ' +
         `the default module path "${DEFAULT}"...`
       )
     }

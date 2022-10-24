@@ -1,5 +1,5 @@
 const mix = require('laravel-mix')
-const webpack = require('webpack')
+//const webpack = require('webpack')
 const pckg = require('./package.json')
 
 const externals = []
@@ -8,7 +8,7 @@ for (const name in pckg.dependencies) {
   externals.push(new RegExp(`^${name}(\\/.+)?$`))
 }
 
-mix.ts('./sources/cli/raven', './distribution')
+mix.ts('./sources/index', './distribution')
    .copy('LICENSE.md', 'distribution')
    .copy('package.json', 'distribution')
    .copy('README.md', 'distribution')
@@ -30,7 +30,7 @@ mix.ts('./sources/cli/raven', './distribution')
      'node': {
        '__dirname': true
      },
-     'plugins': [
+     /*'plugins': [
         new webpack.BannerPlugin({ banner: "#!/usr/bin/env node", raw: true }),
-      ]
+      ]*/
    })

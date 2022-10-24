@@ -12,7 +12,7 @@ const MKDIR_OPTIONS = {
 /**
  * 
  */
-export namespace RavenSass {
+export namespace RavenSassService {
   /**
    * 
    */

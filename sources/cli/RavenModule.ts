@@ -22,6 +22,7 @@ export namespace RavenModule {
    */
   export async function run(path: string, context: RavenContext = new RavenContext()): Promise<void> {
     console.log(`Executing module "${path}"...`)
+    console.log()
 
     const oldDirectory: string = process.cwd()
     process.chdir(paths.dirname(path))

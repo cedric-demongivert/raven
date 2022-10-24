@@ -2,9 +2,7 @@
   "name": "@cedric-demongivert/raven",
   "version": "0.0.2",
   "description": "An unidoc and nunjucks based static site generator.",
-  "bin": {
-    "raven": "./raven.js"
-  },
+  "index": "./index.js",
   "author": "Cédric Demongivert <cedric.demongivert@gmail.com>",
   "license": "MIT",
   "scripts": {

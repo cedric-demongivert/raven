@@ -2,8 +2,8 @@ import { RavenCompiler } from "./compiler"
 import { RavenInput } from "./input"
 import { RavenOperator } from "./operator"
 import { RavenParser } from "./parser"
+import { RavenSassService } from "./service/RavenSassService"
 import { RavenInputContext } from "./RavenInputContext"
-import { RavenSass } from "./RavenSass"
 import { RavenNode } from "./tree"
 
 /**
@@ -77,7 +77,7 @@ export class RavenContext {
    * 
    */
   public sass(path: string, output: string): void {
-    RavenSass.compile(path, output)
+    RavenSassService.compile(path, output)
   }
 }
 
